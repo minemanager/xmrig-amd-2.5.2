@@ -1,4 +1,4 @@
-apt-get install git build-essential cmake libuv1-dev libmicrohttpd-dev
+apt-get install --yes git build-essential cmake libuv1-dev libmicrohttpd-dev
 cd xmrig
 mkdir build
 cd build
