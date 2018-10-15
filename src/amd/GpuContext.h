@@ -4,8 +4,9 @@
  * Copyright 2014      Lucas Jones <https://github.com/lucasjones>
  * Copyright 2014-2016 Wolf9466    <https://github.com/OhGodAPet>
  * Copyright 2016      Jay D Dee   <jayddee246@gmail.com>
- * Copyright 2016-2017 XMRig       <support@xmrig.com>
- *
+ * Copyright 2017-2018 XMR-Stak    <https://github.com/fireice-uk>, <https://github.com/psychocrypt>
+ * Copyright 2018      SChernykh   <https://github.com/SChernykh>
+ * Copyright 2016-2018 XMRig       <https://github.com/xmrig>, <support@xmrig.com>
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -21,19 +22,22 @@
  *   along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __GPUCONTEXT_H__
-#define __GPUCONTEXT_H__
+#ifndef XMRIG_GPUCONTEXT_H
+#define XMRIG_GPUCONTEXT_H
 
 
 #if defined(__APPLE__)
 #   include <OpenCL/cl.h>
 #else
-#   include <CL/cl.h>
+#   include "3rdparty/CL/cl.h"
 #endif
 
 
 #include <stdint.h>
 #include <string>
+
+
+#include "common/xmrig.h"
 
 
 struct GpuContext
@@ -42,6 +46,11 @@ struct GpuContext
         deviceIdx(0),
         rawIntensity(0),
         workSize(0),
+        stridedIndex(1),
+        memChunk(2),
+        compMode(1),
+        unrollFactor(8),
+        vendor(xmrig::OCL_VENDOR_UNKNOWN),
         DeviceID(nullptr),
         CommandQueues(nullptr),
         InputBuffer(nullptr),
@@ -55,10 +64,15 @@ struct GpuContext
     {}
 
 
-    inline GpuContext(size_t index, size_t intensity, size_t worksize) :
+    inline GpuContext(size_t index, size_t intensity, size_t worksize, int stridedIndex, int memChunk, bool compMode, int unrollFactor) :
         deviceIdx(index),
         rawIntensity(intensity),
         workSize(worksize),
+        stridedIndex(stridedIndex),
+        memChunk(memChunk),
+        compMode(compMode ? 1 : 0),
+        unrollFactor(unrollFactor),
+        vendor(xmrig::OCL_VENDOR_UNKNOWN),
         DeviceID(nullptr),
         CommandQueues(nullptr),
         InputBuffer(nullptr),
@@ -75,6 +89,11 @@ struct GpuContext
     size_t deviceIdx;
     size_t rawIntensity;
     size_t workSize;
+    int stridedIndex;
+    int memChunk;
+    int compMode;
+    int unrollFactor;
+    xmrig::OclVendor vendor;
 
     /*Output vars*/
     cl_device_id DeviceID;
@@ -83,7 +102,7 @@ struct GpuContext
     cl_mem OutputBuffer;
     cl_mem ExtraBuffers[6];
     cl_program Program;
-    cl_kernel Kernels[7];
+    cl_kernel Kernels[12];
     size_t freeMem;
     int computeUnits;
     std::string name;
@@ -92,4 +111,4 @@ struct GpuContext
 };
 
 
-#endif /* __GPUCONTEXT_H__ */
+#endif /* XMRIG_GPUCONTEXT_H */

@@ -28,13 +28,14 @@
 #include <atomic>
 
 
+#include "amd/GpuContext.h"
+#include "common/net/Job.h"
+#include "common/xmrig.h"
 #include "interfaces/IWorker.h"
-#include "net/Job.h"
 #include "net/JobResult.h"
 
 
 class Handle;
-struct GpuContext;
 
 
 class OclWorker : public IWorker
@@ -45,6 +46,8 @@ public:
 protected:
     inline uint64_t hashCount() const override { return m_hashCount.load(std::memory_order_relaxed); }
     inline uint64_t timestamp() const override { return m_timestamp.load(std::memory_order_relaxed); }
+    inline bool selfTest() override            { return true; }
+    inline size_t id() const override          { return m_id; }
 
     void start() override;
 
@@ -55,9 +58,8 @@ private:
     void setJob();
     void storeStats();
 
-    bool m_lite;
-    const int m_id;
-    const int m_threads;
+    const size_t m_id;
+    const size_t m_threads;
     GpuContext *m_ctx;
     Job m_job;
     Job m_pausedJob;
